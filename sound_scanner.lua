@@ -1,4 +1,3 @@
-local ms = cloneref(game:GetService("MarketplaceService"))
 
 local on    = true
 local sc    = false
@@ -188,7 +187,7 @@ local function mkBtn(label, xOff)
 end
 
 local sb = mkBtn("SCAN", 0)
-local sv = mkBtn("SAVE", btnW + gap)
+local cl = mkBtn("CLEAR", btnW + gap)
 
 -- ── Results list ──────────────────────────────────────────────────────────────
 local listY = btnH + 8
@@ -298,6 +297,11 @@ local function ta(obj)
 	if not num or f[num] then return end
 	local nm = "Unknown"
 	pcall(function() nm = obj.Name end)
+
+	-- กรองเสียง Equip / Unequip / tool sounds ออก
+	local nmLow = nm:lower()
+	if nmLow:find("equip") or nmLow:find("unequip") or nmLow:find("toolequip") then return end
+
 	f[num] = {n = nm, o = obj}
 	r[num] = mr(num, nm)
 	cnt = cnt + 1
@@ -413,25 +417,11 @@ cb.MouseButton1Click:Connect(function()
 	g:Destroy()
 end)
 
-sv.MouseButton1Click:Connect(function()
-	if cnt == 0 then
-		sv.Text = "EMPTY"
-		task.delay(0.8, function() if sv.Parent then sv.Text = "SAVE" end end)
-		return
-	end
-	local ln = {}
-	for num, data in next, f do
-		ln[#ln+1] = data.n .. " | https://create.roblox.com/store/asset/" .. num
-	end
-	table.sort(ln)
-	local ok = pcall(function()
-		local gn = ms:GetProductInfo(game.PlaceId).Name
-		gn = gn:gsub("[^%w%s%-_]",""):gsub("%s+","_")
-		makefolder("SoundScanner")
-		writefile("SoundScanner/" .. gn .. ".txt", table.concat(ln, "\n"))
-	end)
-	sv.Text = ok and "SAVED" or "ERROR"
-	task.delay(1, function() if sv.Parent then sv.Text = "SAVE" end end)
+cl.MouseButton1Click:Connect(function()
+	for _, row in next, r do pcall(function() row:Destroy() end) end
+	f = {}; r = {}; cnt = 0; swept = false
+	emptyLbl.Visible = true
+	tl.Text = "SOUND SCANNER by Candybibi  -  0"
 end)
 
 sb.MouseButton1Click:Connect(function()
