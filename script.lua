@@ -1,7 +1,7 @@
 --[[
     ================================================================
-    TITLE: MODERN SOUND SCANNER (WITH FULL GUI TOGGLE)
-    DESCRIPTION: Clean & Minimalist Dark Theme Sound Scanner for Roblox
+    TITLE: MODERN SOUND SCANNER (COMPUTE VERSION)
+    DESCRIPTION: Clean & Minimalist Dark Theme Sound Scanner with Toggle GUI
     ================================================================
 --]]
 
@@ -53,10 +53,10 @@ local wStroke = Instance.new("UIStroke", w)
 wStroke.Color = Color3.fromRGB(35, 35, 35)
 wStroke.Thickness = 1
 
---// Small Open Button (ปุ่มเปิดขนาดเล็กเมื่อซ่อน GUI)
+--// [ปุ่มเปิดตอนซ่อน] Small Open Button 
 local openBtn = Instance.new("TextButton")
 openBtn.Size = UDim2.new(0, 60, 0, 30)
-openBtn.Position = UDim2.new(0, 10, 0.5, -15) -- ไว้ฝั่งซ้ายของจอเพื่อไม่ให้บังส่วนอื่น
+openBtn.Position = UDim2.new(0, 10, 0.5, -15) -- อยู่ฝั่งซ้ายกลางจอ
 openBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 openBtn.BorderSizePixel = 0
 openBtn.Text = "Open"
@@ -81,14 +81,14 @@ local tl = Instance.new("TextLabel")
 tl.Size = UDim2.new(1, -85, 0, 32)
 tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
-tl.Text = "SOUND SCANNER (0)"
+tl.Text = "SOUND SCANNER by Candybibi (0)"
 tl.TextColor3 = Color3.fromRGB(230, 230, 230)
 tl.TextSize = 11
 tl.Font = Enum.Font.Code
 tl.TextXAlignment = Enum.TextXAlignment.Left
 tl.Parent = w
 
---// Minimal Close Button (ปุ่มปิดโปรแกรม)
+--// Minimal Close Button (ปุ่มปิด X)
 local cb = Instance.new("TextButton")
 cb.Size = UDim2.new(0, 24, 0, 24)
 cb.Position = UDim2.new(1, -32, 0, 4)
@@ -102,7 +102,7 @@ cb.Parent = w
 cb.MouseEnter:Connect(function() cb.TextColor3 = Color3.fromRGB(250, 100, 100) end)
 cb.MouseLeave:Connect(function() cb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
---// Full GUI Minimize Button (ปุ่มซ่อนทั้ง GUI)
+--// [ปุ่มซ่อน GUI] Minimize Button (_)
 local mb = Instance.new("TextButton")
 mb.Size = UDim2.new(0, 24, 0, 24)
 mb.Position = UDim2.new(1, -56, 0, 4)
@@ -116,7 +116,7 @@ mb.Parent = w
 mb.MouseEnter:Connect(function() mb.TextColor3 = Color3.fromRGB(200, 200, 200) end)
 mb.MouseLeave:Connect(function() mb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
---// Toggle Panel Button (ปุ่มหดเฉพาะแถบ Sources ค้างไว้จากเวอร์ชันก่อน)
+--// [ปุ่มหดแท็บ Sources] Toggle Panel Button (ตัว -)
 local tg = Instance.new("TextButton")
 tg.Size = UDim2.new(0, 24, 0, 24)
 tg.Position = UDim2.new(1, -80, 0, 4)
@@ -273,7 +273,7 @@ tg.MouseButton1Click:Connect(function()
 	end
 end)
 
---// Full GUI Show / Hide Logic (เปิด-ปิดหน้าต่างหลัก)
+--// Full GUI Show / Hide Logic (ระบบปุ่มซ่อนทั้งหมด)
 mb.MouseButton1Click:Connect(function()
 	w.Visible = false
 	openBtn.Visible = true
