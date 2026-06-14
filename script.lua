@@ -1,7 +1,7 @@
 -- [[
     ================================================================
-    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION) - FIXED ROW
-    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + Fixed Original Format
+    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION)
+    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + Original Row Format
     ================================================================
 --]]
 
@@ -28,7 +28,7 @@ for _,x in pairs(gethui():GetChildren()) do
 	end
 end
 
---// Modern Compact Window Frame (ความกว้าง 310 เพื่อให้ชื่อแสดงได้สวยงาม)
+--// Modern Compact Window Frame (ขยายความกว้างกลับเป็น 310 เพื่อรองรับชื่อยาวๆ แบบเดิม)
 local w = Instance.new("Frame")
 w.Size = UDim2.new(0, 310, 0, 320)
 w.Position = UDim2.new(0.5, -155, 0.5, -160)
@@ -178,7 +178,7 @@ openBtn.MouseButton1Click:Connect(function()
 	w.Visible = true
 end)
 
---// Modern Row Element Creator (แก้ไขให้รับค่า nm กลับมาใส่ใน UI แล้ว)
+--// Modern Row Element Creator (ปรับกลับมาโชว์แบบเดิม: ชื่อวัตถุ [ID])
 local function mr(id, nm)
 	local u = "https://create.roblox.com/store/asset/" .. id
 	local e = Instance.new("Frame")
@@ -205,7 +205,7 @@ local function mr(id, nm)
 	l.Size = UDim2.new(1, -66, 1, 0)
 	l.Position = UDim2.new(0, 22, 0, 0)
 	l.BackgroundTransparency = 1
-	l.Text = nm .. " [" .. id .. "]" -- << แสดงชื่อวัตถุคู่กับ ID เรียบร้อย
+	l.Text = nm .. " [" .. id .. "]" -- << แสดงกลับเป็นชื่อเดิมแบบที่คุณต้องการ
 	l.TextColor3 = Color3.fromRGB(150, 150, 150)
 	l.TextSize = 10
 	l.Font = Enum.Font.Code
@@ -264,7 +264,7 @@ local function ta(obj)
 	pcall(function() nm = obj.Name end)
 
 	f[num] = {n = nm, o = obj}
-	r[num] = mr(num, nm) -- << ส่งค่าทั้ง ID และ Name เข้าฟังก์ชันสร้างแถว
+	r[num] = mr(num, nm)
 	cnt = cnt + 1
 	tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 end
@@ -412,3 +412,4 @@ task.spawn(function()
 		task.wait(2.5)
 	end
 end)
+
