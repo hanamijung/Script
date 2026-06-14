@@ -1,23 +1,15 @@
-local ps = cloneref(game:GetService("Players"))
 local ms = cloneref(game:GetService("MarketplaceService"))
 
-local on = true
-local sc = false
+local on    = true
+local sc    = false
 local swept = false
-local cnt = 0
-local f = {}
-local r = {}
-local cn = {}
+local cnt   = 0
+local f     = {}
+local r     = {}
+local cn    = {}
+local hidden = false
 
-local opt = {
-	{k="g", t="game tree",        v=true},
-	{k="n", t="nil instances",    v=true},
-	{k="m", t="modules",          v=true},
-	{k="c", t="garbage collector",v=false},
-	{k="a", t="all instances",    v=false},
-}
-
--- ── Palette ─────────────────────────────────────────────────────────────────
+-- ── Palette ──────────────────────────────────────────────────────────────────
 local C = {
 	bg      = Color3.fromRGB(13, 13, 17),
 	surface = Color3.fromRGB(20, 20, 27),
@@ -34,15 +26,15 @@ local C = {
 	play    = Color3.fromRGB(80, 200, 130),
 }
 
--- ── Helpers ──────────────────────────────────────────────────────────────────
+-- ── Helpers ───────────────────────────────────────────────────────────────────
 local function mk(cls, props)
 	local o = Instance.new(cls)
 	for k, v in next, props do o[k] = v end
 	return o
 end
 
-local function corner(parent, r)
-	mk("UICorner", {CornerRadius=UDim.new(0, r or 5), Parent=parent})
+local function corner(parent, rad)
+	mk("UICorner", {CornerRadius = UDim.new(0, rad or 5), Parent = parent})
 end
 
 local function pad(parent, px)
@@ -55,22 +47,38 @@ local function pad(parent, px)
 	})
 end
 
--- ── Root GUI ─────────────────────────────────────────────────────────────────
+-- ── Root GUI ──────────────────────────────────────────────────────────────────
 local g = mk("ScreenGui", {
-	Name          = string.char(math.random(97,122)) .. math.random(10000,99999),
-	ResetOnSpawn  = false,
-	Parent        = gethui(),
+	Name         = string.char(math.random(97,122)) .. math.random(10000,99999),
+	ResetOnSpawn = false,
+	Parent       = gethui(),
 })
 
--- clean old instances
 for _, x in pairs(gethui():GetChildren()) do
 	if x ~= g and x:IsA("ScreenGui") and #x.Name > 4 and x.Name:sub(1,1):match("%l") then
 		pcall(function() x:Destroy() end)
 	end
 end
 
--- ── Window ───────────────────────────────────────────────────────────────────
-local W_W, W_H = 310, 430
+-- ── Floating hide/show toggle (always visible) ────────────────────────────────
+local W_W, W_H = 310, 380
+
+local toggle = mk("TextButton", {
+	Size             = UDim2.new(0, 90, 0, 26),
+	Position         = UDim2.new(0.5, -45, 0, 6),
+	BackgroundColor3 = C.surface,
+	BorderSizePixel  = 0,
+	Text             = "SS  hide",
+	TextColor3       = C.muted,
+	TextSize         = 10,
+	Font             = Enum.Font.GothamMedium,
+	ZIndex           = 10,
+	Parent           = g,
+})
+corner(toggle, 5)
+mk("UIStroke", {Color = C.border, Thickness = 1, Parent = toggle})
+
+-- ── Main window ───────────────────────────────────────────────────────────────
 local w = mk("Frame", {
 	Size             = UDim2.new(0, W_W, 0, W_H),
 	Position         = UDim2.new(0.5, -W_W/2, 0.5, -W_H/2),
@@ -81,26 +89,26 @@ local w = mk("Frame", {
 	Parent           = g,
 })
 corner(w, 8)
-mk("UIStroke", {Color=C.border, Thickness=1, Parent=w})
+mk("UIStroke", {Color = C.border, Thickness = 1, Parent = w})
 
--- subtle inner glow at top
-local glow = mk("Frame", {
+-- accent top line
+mk("Frame", {
 	Size             = UDim2.new(1, 0, 0, 1),
 	BackgroundColor3 = C.accent,
-	BackgroundTransparency = 0.6,
+	BackgroundTransparency = 0.5,
 	BorderSizePixel  = 0,
 	Parent           = w,
 })
 
--- ── Title bar ────────────────────────────────────────────────────────────────
+-- ── Title bar ─────────────────────────────────────────────────────────────────
 local titlebar = mk("Frame", {
-	Size             = UDim2.new(1, 0, 0, 36),
+	Size             = UDim2.new(1, 0, 0, 38),
 	BackgroundColor3 = C.surface,
 	BorderSizePixel  = 0,
 	Parent           = w,
 })
 corner(titlebar, 8)
--- mask bottom corners of titlebar
+-- mask bottom corners
 mk("Frame", {
 	Size             = UDim2.new(1, 0, 0, 8),
 	Position         = UDim2.new(0, 0, 1, -8),
@@ -109,147 +117,64 @@ mk("Frame", {
 	Parent           = titlebar,
 })
 
--- dot accent
-mk("Frame", {
-	Size             = UDim2.new(0, 6, 0, 6),
+-- accent dot
+local dot = mk("Frame", {
+	Size             = UDim2.new(0, 7, 0, 7),
 	Position         = UDim2.new(0, 12, 0.5, -3),
 	BackgroundColor3 = C.accent,
 	BorderSizePixel  = 0,
 	Parent           = titlebar,
-}); do
-	local dp = titlebar:FindFirstChildOfClass("Frame")
-	if dp then corner(dp, 3) end
-end
+})
+corner(dot, 4)
 
 local tl = mk("TextLabel", {
-	Size                = UDim2.new(1, -60, 1, 0),
-	Position            = UDim2.new(0, 26, 0, 0),
+	Size               = UDim2.new(1, -90, 1, 0),
+	Position           = UDim2.new(0, 26, 0, 0),
 	BackgroundTransparency = 1,
-	Text                = "Sound Scanner  ·  0",
-	TextColor3          = C.bright,
-	TextSize            = 12,
-	Font                = Enum.Font.GothamMedium,
-	TextXAlignment      = Enum.TextXAlignment.Left,
-	Parent              = titlebar,
+	Text               = "SOUND SCANNER by Candybibi  -  0",
+	TextColor3         = C.bright,
+	TextSize           = 11,
+	Font               = Enum.Font.GothamBold,
+	TextXAlignment     = Enum.TextXAlignment.Left,
+	Parent             = titlebar,
 })
 
+-- close button
 local cb = mk("TextButton", {
-	Size                = UDim2.new(0, 28, 0, 28),
-	Position            = UDim2.new(1, -32, 0.5, -14),
-	BackgroundColor3    = C.card,
-	BorderSizePixel     = 0,
-	Text                = "✕",
-	TextColor3          = C.muted,
-	TextSize            = 11,
-	Font                = Enum.Font.GothamBold,
-	Parent              = titlebar,
+	Size             = UDim2.new(0, 28, 0, 26),
+	Position         = UDim2.new(1, -32, 0.5, -13),
+	BackgroundColor3 = C.card,
+	BorderSizePixel  = 0,
+	Text             = "X",
+	TextColor3       = C.muted,
+	TextSize         = 11,
+	Font             = Enum.Font.GothamBold,
+	Parent           = titlebar,
 })
 corner(cb, 5)
+cb.MouseEnter:Connect(function() cb.BackgroundColor3 = C.redD; cb.TextColor3 = C.red end)
+cb.MouseLeave:Connect(function() cb.BackgroundColor3 = C.card; cb.TextColor3 = C.muted end)
 
--- hover effect on close button
-cb.MouseEnter:Connect(function()
-	cb.BackgroundColor3 = C.redD
-	cb.TextColor3 = C.red
-end)
-cb.MouseLeave:Connect(function()
-	cb.BackgroundColor3 = C.card
-	cb.TextColor3 = C.muted
-end)
-
--- ── Sources section ───────────────────────────────────────────────────────────
+-- ── Body ──────────────────────────────────────────────────────────────────────
 local body = mk("Frame", {
-	Size             = UDim2.new(1, 0, 1, -36),
-	Position         = UDim2.new(0, 0, 0, 36),
+	Size             = UDim2.new(1, 0, 1, -38),
+	Position         = UDim2.new(0, 0, 0, 38),
 	BackgroundTransparency = 1,
 	BorderSizePixel  = 0,
 	Parent           = w,
 })
 pad(body, 8)
 
-local srcLabel = mk("TextLabel", {
-	Size                = UDim2.new(1, 0, 0, 14),
-	BackgroundTransparency = 1,
-	Text                = "SOURCES",
-	TextColor3          = C.dim,
-	TextSize            = 9,
-	Font                = Enum.Font.GothamBold,
-	TextXAlignment      = Enum.TextXAlignment.Left,
-	LayoutOrder         = 1,
-	Parent              = body,
-})
+-- ── Action buttons (only Scan + Save) ────────────────────────────────────────
+local btnH = 28
+local gap  = 6
+local btnW = (W_W - 16 - gap) / 2
 
-local yo = 18
-for _, s in next, opt do
-	local rf = mk("Frame", {
-		Size             = UDim2.new(1, 0, 0, 24),
-		Position         = UDim2.new(0, 0, 0, yo),
-		BackgroundColor3 = s.v and C.accentD or C.card,
-		BorderSizePixel  = 0,
-		Parent           = body,
-	})
-	corner(rf, 4)
-
-	-- checkbox
-	local tb = mk("TextButton", {
-		Size             = UDim2.new(0, 14, 0, 14),
-		Position         = UDim2.new(0, 6, 0.5, -7),
-		BackgroundColor3 = s.v and C.accent or C.dim,
-		BorderSizePixel  = 0,
-		Text             = s.v and "✓" or "",
-		TextColor3       = C.bg,
-		TextSize         = 9,
-		Font             = Enum.Font.GothamBold,
-		Parent           = rf,
-	})
-	corner(tb, 3)
-
-	mk("TextLabel", {
-		Size                = UDim2.new(1, -30, 1, 0),
-		Position            = UDim2.new(0, 26, 0, 0),
-		BackgroundTransparency = 1,
-		Text                = s.t,
-		TextColor3          = s.v and C.text or C.muted,
-		TextSize            = 10,
-		Font                = Enum.Font.Gotham,
-		TextXAlignment      = Enum.TextXAlignment.Left,
-		Parent              = rf,
-	})
-
-	local lbl = rf:FindFirstChildOfClass("TextLabel")
-
-	tb.MouseButton1Click:Connect(function()
-		s.v = not s.v
-		tb.Text             = s.v and "✓" or ""
-		tb.BackgroundColor3 = s.v and C.accent or C.dim
-		rf.BackgroundColor3 = s.v and C.accentD or C.card
-		if lbl then lbl.TextColor3 = s.v and C.text or C.muted end
-		if s.v then swept = false end
-	end)
-
-	yo = yo + 27
-end
-
--- ── Divider ───────────────────────────────────────────────────────────────────
-local divY = yo + 6
-mk("Frame", {
-	Size             = UDim2.new(1, 0, 0, 1),
-	Position         = UDim2.new(0, 0, 0, divY),
-	BackgroundColor3 = C.border,
-	BorderSizePixel  = 0,
-	Parent           = body,
-})
-
--- ── Action buttons ────────────────────────────────────────────────────────────
-local btnY  = divY + 9
-local btnH  = 26
-local gap   = 5
-local btnW  = (W_W - 16 - gap*2) / 3
-
-local function mkBtn(label, xOff, color)
+local function mkBtn(label, xOff)
 	local b = mk("TextButton", {
 		Size             = UDim2.new(0, btnW, 0, btnH),
-		Position         = UDim2.new(0, xOff, 0, btnY),
-		BackgroundColor3 = color or C.card,
+		Position         = UDim2.new(0, xOff, 0, 0),
+		BackgroundColor3 = C.card,
 		BorderSizePixel  = 0,
 		Text             = label,
 		TextColor3       = C.text,
@@ -257,56 +182,65 @@ local function mkBtn(label, xOff, color)
 		Font             = Enum.Font.GothamMedium,
 		Parent           = body,
 	})
-	corner(b, 5)
-	mk("UIStroke", {Color=C.border, Thickness=1, Parent=b})
+	corner(b, 6)
+	mk("UIStroke", {Color = C.border, Thickness = 1, Parent = b})
 	return b
 end
 
-local sb = mkBtn("⟳  scan", 0)
-local sv = mkBtn("↓  save", btnW + gap)
-local cl = mkBtn("✕  clear", (btnW + gap) * 2)
+local sb = mkBtn("SCAN", 0)
+local sv = mkBtn("SAVE", btnW + gap)
 
 -- ── Results list ──────────────────────────────────────────────────────────────
-local listY  = btnY + btnH + 8
-local listH  = W_H - 36 - 8 - listY   -- remaining space
+local listY = btnH + 8
+local listH = W_H - 38 - 8 - listY
 
 local sf = mk("ScrollingFrame", {
-	Size                = UDim2.new(1, 0, 0, listH),
-	Position            = UDim2.new(0, 0, 0, listY),
-	BackgroundColor3    = C.surface,
-	BorderSizePixel     = 0,
-	ScrollBarThickness  = 3,
+	Size                 = UDim2.new(1, 0, 0, listH),
+	Position             = UDim2.new(0, 0, 0, listY),
+	BackgroundColor3     = C.surface,
+	BorderSizePixel      = 0,
+	ScrollBarThickness   = 3,
 	ScrollBarImageColor3 = C.dim,
-	CanvasSize          = UDim2.new(0, 0, 0, 0),
-	AutomaticCanvasSize = Enum.AutomaticSize.Y,
-	Parent              = body,
+	CanvasSize           = UDim2.new(0, 0, 0, 0),
+	AutomaticCanvasSize  = Enum.AutomaticSize.Y,
+	Parent               = body,
 })
-corner(sf, 5)
-mk("UIStroke", {Color=C.border, Thickness=1, Parent=sf})
-
-local ll = mk("UIListLayout", {
-	Padding        = UDim.new(0, 1),
-	Parent         = sf,
-})
+corner(sf, 6)
+mk("UIStroke", {Color = C.border, Thickness = 1, Parent = sf})
+mk("UIListLayout", {Padding = UDim.new(0, 2), Parent = sf})
 pad(sf, 4)
+
+-- ── Empty state label ─────────────────────────────────────────────────────────
+local emptyLbl = mk("TextLabel", {
+	Size               = UDim2.new(1, 0, 0, listH),
+	Position           = UDim2.new(0, 0, 0, listY),
+	BackgroundTransparency = 1,
+	Text               = "Press SCAN to find sounds",
+	TextColor3         = C.dim,
+	TextSize           = 10,
+	Font               = Enum.Font.Gotham,
+	Parent             = body,
+})
 
 -- ── Sound row factory ─────────────────────────────────────────────────────────
 local function mr(id, nm)
 	local url = "https://create.roblox.com/store/asset/" .. id
 
+	emptyLbl.Visible = false
+
 	local e = mk("Frame", {
-		Size             = UDim2.new(1, 0, 0, 30),
+		Size             = UDim2.new(1, 0, 0, 32),
 		BackgroundColor3 = C.card,
 		BorderSizePixel  = 0,
 		Parent           = sf,
 	})
-	corner(e, 4)
+	corner(e, 5)
 
-	-- playing indicator dot
+	-- playing dot
 	local d = mk("Frame", {
 		Name             = "d",
 		Size             = UDim2.new(0, 6, 0, 6),
-		Position         = UDim2.new(0, 5, 0.5, -3),
+		Position         = UDim2.new(0, 6, 0.5, -3),
 		BackgroundColor3 = C.play,
 		BackgroundTransparency = 1,
 		BorderSizePixel  = 0,
@@ -315,21 +249,21 @@ local function mr(id, nm)
 	corner(d, 3)
 
 	mk("TextLabel", {
-		Size                = UDim2.new(1, -60, 1, 0),
-		Position            = UDim2.new(0, 16, 0, 0),
+		Size               = UDim2.new(1, -62, 1, 0),
+		Position           = UDim2.new(0, 17, 0, 0),
 		BackgroundTransparency = 1,
-		Text                = nm .. "  " .. id,
-		TextColor3          = C.text,
-		TextSize            = 10,
-		Font                = Enum.Font.Gotham,
-		TextXAlignment      = Enum.TextXAlignment.Left,
-		TextTruncate        = Enum.TextTruncate.AtEnd,
-		Parent              = e,
+		Text               = nm .. "  " .. id,
+		TextColor3         = C.text,
+		TextSize           = 10,
+		Font               = Enum.Font.Gotham,
+		TextXAlignment     = Enum.TextXAlignment.Left,
+		TextTruncate       = Enum.TextTruncate.AtEnd,
+		Parent             = e,
 	})
 
 	local b = mk("TextButton", {
-		Size             = UDim2.new(0, 40, 0, 20),
-		Position         = UDim2.new(1, -44, 0.5, -10),
+		Size             = UDim2.new(0, 42, 0, 22),
+		Position         = UDim2.new(1, -46, 0.5, -11),
 		BackgroundColor3 = C.surface,
 		BorderSizePixel  = 0,
 		Text             = "copy",
@@ -339,24 +273,21 @@ local function mr(id, nm)
 		Parent           = e,
 	})
 	corner(b, 4)
-	mk("UIStroke", {Color=C.border, Thickness=1, Parent=b})
+	mk("UIStroke", {Color = C.border, Thickness = 1, Parent = b})
 
 	b.MouseButton1Click:Connect(function()
 		setclipboard(url)
-		b.Text      = "✓"
+		b.Text       = "OK"
 		b.TextColor3 = C.accent
 		task.delay(0.8, function()
-			if b.Parent then
-				b.Text       = "copy"
-				b.TextColor3 = C.muted
-			end
+			if b.Parent then b.Text = "copy"; b.TextColor3 = C.muted end
 		end)
 	end)
 
 	return e
 end
 
--- ── Core logic (unchanged) ────────────────────────────────────────────────────
+-- ── Core scan logic ───────────────────────────────────────────────────────────
 local function ta(obj)
 	if not on then return end
 	if typeof(obj) ~= "Instance" then return end
@@ -367,21 +298,18 @@ local function ta(obj)
 	if not num or f[num] then return end
 	local nm = "Unknown"
 	pcall(function() nm = obj.Name end)
-	f[num] = {n=nm, o=obj}
+	f[num] = {n = nm, o = obj}
 	r[num] = mr(num, nm)
 	cnt = cnt + 1
-	tl.Text = "Sound Scanner  ·  " .. cnt
+	tl.Text = "SOUND SCANNER by Candybibi  -  " .. cnt
 end
 
-local function chk(k)
-	for _, x in next, opt do
-		if x.k == k then return x.v end
-	end
-end
-
+-- always scan all sources
 local function dosweep()
 	local i = 0
-	if chk("g") and sc then
+
+	-- game tree
+	if sc then
 		local d = game:GetDescendants()
 		for j = 1, #d do
 			if not sc then return end
@@ -393,7 +321,9 @@ local function dosweep()
 		end
 		d = nil; task.wait()
 	end
-	if chk("n") and sc then
+
+	-- nil instances
+	if sc then
 		pcall(function()
 			local ni = getnilinstances()
 			for j = 1, #ni do
@@ -404,7 +334,9 @@ local function dosweep()
 		end)
 		task.wait()
 	end
-	if chk("m") and sc then
+
+	-- modules
+	if sc then
 		pcall(function()
 			local md = getloadedmodules()
 			for j = 1, #md do
@@ -422,7 +354,9 @@ local function dosweep()
 		end)
 		task.wait()
 	end
-	if chk("a") and sc then
+
+	-- all instances
+	if sc then
 		pcall(function()
 			local al = getinstances()
 			for j = 1, #al do
@@ -432,21 +366,8 @@ local function dosweep()
 			end
 			al = nil
 		end)
-		task.wait()
 	end
-	if chk("c") and sc then
-		pcall(function()
-			local gc = getgc(true)
-			for j = 1, #gc do
-				if not sc then return end
-				if typeof(gc[j]) == "Instance" then
-					pcall(function() if gc[j]:IsA("Sound") then ta(gc[j]) end end)
-				end
-				i += 1; if i % 600 == 0 then task.wait() end
-			end
-			gc = nil
-		end)
-	end
+
 	if sc then swept = true end
 end
 
@@ -463,7 +384,7 @@ local function upd()
 	end
 end
 
--- ── Hooks & connections ───────────────────────────────────────────────────────
+-- ── Hooks ─────────────────────────────────────────────────────────────────────
 local onc
 onc = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 	if not on then return onc(self, ...) end
@@ -492,15 +413,10 @@ cb.MouseButton1Click:Connect(function()
 	g:Destroy()
 end)
 
-cl.MouseButton1Click:Connect(function()
-	for _, row in next, r do pcall(function() row:Destroy() end) end
-	f = {}; r = {}; cnt = 0; swept = false
-	tl.Text = "Sound Scanner  ·  0"
-end)
-
 sv.MouseButton1Click:Connect(function()
 	if cnt == 0 then
-		sv.Text = "empty"; task.delay(0.8, function() if sv.Parent then sv.Text = "↓  save" end end)
+		sv.Text = "EMPTY"
+		task.delay(0.8, function() if sv.Parent then sv.Text = "SAVE" end end)
 		return
 	end
 	local ln = {}
@@ -514,25 +430,36 @@ sv.MouseButton1Click:Connect(function()
 		makefolder("SoundScanner")
 		writefile("SoundScanner/" .. gn .. ".txt", table.concat(ln, "\n"))
 	end)
-	sv.Text = ok and "✓ saved" or "error"
-	task.delay(1, function() if sv.Parent then sv.Text = "↓  save" end end)
+	sv.Text = ok and "SAVED" or "ERROR"
+	task.delay(1, function() if sv.Parent then sv.Text = "SAVE" end end)
 end)
 
 sb.MouseButton1Click:Connect(function()
 	sc = not sc
 	if sc then
-		sb.Text             = "■  stop"
+		sb.Text             = "STOP"
 		sb.BackgroundColor3 = C.redD
-		mk("UIStroke", {Color=C.red, Thickness=1, Parent=sb})
+		local stroke = sb:FindFirstChildOfClass("UIStroke")
+		if stroke then stroke.Color = C.red end
+		sb.TextColor3 = C.red
 		print("[SoundScanner] Scanning...")
 		if not swept then task.spawn(dosweep) end
 	else
 		print("[SoundScanner] Stopped. Found " .. cnt .. " sounds.")
-		sb.Text             = "⟳  scan"
+		sb.Text             = "SCAN"
 		sb.BackgroundColor3 = C.card
-		local s = sb:FindFirstChildOfClass("UIStroke")
-		if s then s.Color = C.border end
+		sb.TextColor3       = C.text
+		local stroke = sb:FindFirstChildOfClass("UIStroke")
+		if stroke then stroke.Color = C.border end
 	end
+end)
+
+-- ── Toggle hide/show ──────────────────────────────────────────────────────────
+toggle.MouseButton1Click:Connect(function()
+	hidden = not hidden
+	w.Visible      = not hidden
+	toggle.Text    = hidden and "SS  show" or "SS  hide"
+	toggle.TextColor3 = hidden and C.accent or C.muted
 end)
 
 -- ── Update loop ───────────────────────────────────────────────────────────────
