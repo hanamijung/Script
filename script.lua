@@ -1,7 +1,7 @@
 -- [[
     ================================================================
-    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION)
-    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + Original Row Format
+    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION) - ID & LINK BUTTONS
+    DESCRIPTION: Clean Dark Theme with Dual Copy Buttons (ID Only & Full URL Link)
     ================================================================
 --]]
 
@@ -28,10 +28,10 @@ for _,x in pairs(gethui():GetChildren()) do
 	end
 end
 
---// Modern Compact Window Frame (ขยายความกว้างกลับเป็น 310 เพื่อรองรับชื่อยาวๆ แบบเดิม)
+--// Modern Compact Window Frame (ขยายความกว้างเป็น 340 เพื่อรองรับปุ่มคู่ id & link)
 local w = Instance.new("Frame")
-w.Size = UDim2.new(0, 310, 0, 320)
-w.Position = UDim2.new(0.5, -155, 0.5, -160)
+w.Size = UDim2.new(0, 340, 0, 320)
+w.Position = UDim2.new(0.5, -170, 0.5, -160)
 w.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 w.BorderSizePixel = 0
 w.Active = true
@@ -129,7 +129,7 @@ sfStroke.Thickness = 1
 
 Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
 
---// Action Buttons Setup
+--// Action Buttons Setup (scan / clear)
 local abFrame = Instance.new("Frame")
 abFrame.Size = UDim2.new(1, -24, 0, 30)
 abFrame.Position = UDim2.new(0, 12, 1, -38)
@@ -178,7 +178,7 @@ openBtn.MouseButton1Click:Connect(function()
 	w.Visible = true
 end)
 
---// Modern Row Element Creator (ปรับกลับมาโชว์แบบเดิม: ชื่อวัตถุ [ID])
+--// Modern Row Element Creator (ปรับปรุงเป็นปุ่มคู่ id และ link)
 local function mr(id, nm)
 	local u = "https://create.roblox.com/store/asset/" .. id
 	local e = Instance.new("Frame")
@@ -202,10 +202,10 @@ local function mr(id, nm)
 	d.Parent = e
 
 	local l = Instance.new("TextLabel")
-	l.Size = UDim2.new(1, -66, 1, 0)
+	l.Size = UDim2.new(1, -100, 1, 0) -- ปรับพื้นที่ text ให้สมดุลกับปุ่มที่เพิ่มขึ้นมา
 	l.Position = UDim2.new(0, 22, 0, 0)
 	l.BackgroundTransparency = 1
-	l.Text = nm .. " [" .. id .. "]" -- << แสดงกลับเป็นชื่อเดิมแบบที่คุณต้องการ
+	l.Text = nm .. " [" .. id .. "]"
 	l.TextColor3 = Color3.fromRGB(150, 150, 150)
 	l.TextSize = 10
 	l.Font = Enum.Font.Code
@@ -213,37 +213,63 @@ local function mr(id, nm)
 	l.TextTruncate = Enum.TextTruncate.AtEnd
 	l.Parent = e
 
-	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0, 38, 0, 18)
-	b.Position = UDim2.new(1, -44, 0.5, -9)
-	b.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-	b.BorderSizePixel = 0
-	b.Text = "copy"
-	b.TextColor3 = Color3.fromRGB(130, 130, 130)
-	b.TextSize = 10
-	b.Font = Enum.Font.Code
-	b.Parent = e
+	-- ฟังก์ชันช่วยสร้างปุ่มในแถวแบบคุมธีมเดียวกัน
+	local function createRowBtn(text, posX)
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(0, 36, 0, 18)
+		btn.Position = UDim2.new(1, posX, 0.5, -9)
+		btn.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+		btn.BorderSizePixel = 0
+		btn.Text = text
+		btn.TextColor3 = Color3.fromRGB(130, 130, 130)
+		btn.TextSize = 9.5
+		btn.Font = Enum.Font.Code
+		btn.Parent = e
 
-	local bCorner = Instance.new("UICorner", b)
-	bCorner.CornerRadius = UDim.new(0, 3)
-	
-	local bStroke = Instance.new("UIStroke", b)
-	bStroke.Color = Color3.fromRGB(40, 40, 40)
-	bStroke.Thickness = 1
+		local bCorner = Instance.new("UICorner", btn)
+		bCorner.CornerRadius = UDim.new(0, 3)
+		
+		local bStroke = Instance.new("UIStroke", btn)
+		bStroke.Color = Color3.fromRGB(40, 40, 40)
+		bStroke.Thickness = 1
 
-	b.MouseButton1Click:Connect(function()
-		setclipboard(u)
-		b.Text = "ok"
-		b.TextColor3 = Color3.fromRGB(85, 185, 105)
-		bStroke.Color = Color3.fromRGB(45, 85, 55)
+		return btn, bStroke
+	end
+
+	-- สร้างปุ่มย่อย id และ link ฝั่งขวาของแถว
+	local bId, strokeId = createRowBtn("id", -84)
+	local bLink, strokeLink = createRowBtn("link", -42)
+
+	-- กลไกปุ่มคัดลอกเฉพาะเลข ID
+	bId.MouseButton1Click:Connect(function()
+		setclipboard(id) -- ดึงเฉพาะเลข ID ล้วน ๆ
+		bId.Text = "ok"
+		bId.TextColor3 = Color3.fromRGB(85, 185, 105)
+		strokeId.Color = Color3.fromRGB(45, 85, 55)
 		task.delay(0.8, function()
-			if b.Parent then 
-				b.Text = "copy" 
-				b.TextColor3 = Color3.fromRGB(130, 130, 130)
-				bStroke.Color = Color3.fromRGB(40, 40, 40)
+			if bId.Parent then 
+				bId.Text = "id" 
+				bId.TextColor3 = Color3.fromRGB(130, 130, 130)
+				strokeId.Color = Color3.fromRGB(40, 40, 40)
 			end
 		end)
 	end)
+
+	-- กลไกปุ่มคัดลอกเป็น URL ลิงก์เต็มรูปแบบ
+	bLink.MouseButton1Click:Connect(function()
+		setclipboard(u) -- ดึง URL เต็มรูปแบบ
+		bLink.Text = "ok"
+		bLink.TextColor3 = Color3.fromRGB(85, 185, 105)
+		strokeLink.Color = Color3.fromRGB(45, 85, 55)
+		task.delay(0.8, function()
+			if bLink.Parent then 
+				bLink.Text = "link" 
+				bLink.TextColor3 = Color3.fromRGB(130, 130, 130)
+				strokeLink.Color = Color3.fromRGB(40, 40, 40)
+			end
+		end)
+	end)
+
 	return e
 end
 
