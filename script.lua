@@ -1,7 +1,7 @@
 -- [[
     ================================================================
-    TITLE: SOUND SCANNER (CANDYBIBI EDITION) - FULL FIXED EXECUTION
-    DESCRIPTION: Fixed execution runtime, added name display, and dual copy buttons.
+    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION) - FIXED ROW
+    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + Fixed Original Format
     ================================================================
 --]]
 
@@ -16,14 +16,7 @@ local f = {}
 local r = {}
 local cn = {}
 
-local opt = {
-	{k="g", t="game tree", v=true},
-	{k="n", t="nil instances", v=true},
-	{k="m", t="modules", v=true},
-	{k="c", t="garbage collector", v=false},
-	{k="a", t="all instances", v=false},
-}
-
+--// Main GUI Base
 local g = Instance.new("ScreenGui")
 g.Name = string.char(math.random(97,122)) .. math.random(10000,99999)
 g.ResetOnSpawn = false
@@ -35,235 +28,226 @@ for _,x in pairs(gethui():GetChildren()) do
 	end
 end
 
---// ปรับความกว้าง Frame จาก 300 เป็น 350 เพื่อให้ปุ่มคู่ id & link ไม่เบียดกัน
+--// Modern Compact Window Frame (ความกว้าง 310 เพื่อให้ชื่อแสดงได้สวยงาม)
 local w = Instance.new("Frame")
-w.Size = UDim2.new(0, 350, 0, 420)
-w.Position = UDim2.new(0.5, -175, 0.5, -210)
-w.BackgroundColor3 = Color3.fromRGB(20,20,20)
-w.BorderColor3 = Color3.fromRGB(45,45,45)
-w.BorderSizePixel = 1
+w.Size = UDim2.new(0, 310, 0, 320)
+w.Position = UDim2.new(0.5, -155, 0.5, -160)
+w.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+w.BorderSizePixel = 0
 w.Active = true
 w.Draggable = true
 w.Parent = g
 
+local wCorner = Instance.new("UICorner", w)
+wCorner.CornerRadius = UDim.new(0, 8)
+
+local wStroke = Instance.new("UIStroke", w)
+wStroke.Color = Color3.fromRGB(35, 35, 35)
+wStroke.Thickness = 1
+
+--// [ปุ่มเปิดตอนซ่อน] Small Open Button 
+local openBtn = Instance.new("TextButton")
+openBtn.Size = UDim2.new(0, 60, 0, 30)
+openBtn.Position = UDim2.new(0, 10, 0.5, -15)
+openBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+openBtn.BorderSizePixel = 0
+openBtn.Text = "Open"
+openBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+openBtn.TextSize = 11
+openBtn.Font = Enum.Font.Code
+openBtn.Visible = false
+openBtn.Parent = g
+
+local obCorner = Instance.new("UICorner", openBtn)
+obCorner.CornerRadius = UDim.new(0, 6)
+
+local obStroke = Instance.new("UIStroke", openBtn)
+obStroke.Color = Color3.fromRGB(45, 45, 45)
+obStroke.Thickness = 1
+
+openBtn.MouseEnter:Connect(function() obStroke.Color = Color3.fromRGB(70, 70, 70) openBtn.TextColor3 = Color3.fromRGB(230, 230, 230) end)
+openBtn.MouseLeave:Connect(function() obStroke.Color = Color3.fromRGB(45, 45, 45) openBtn.TextColor3 = Color3.fromRGB(180, 180, 180) end)
+
+--// Top Bar Title
 local tl = Instance.new("TextLabel")
-tl.Size = UDim2.new(1,-24,0,24)
-tl.Position = UDim2.new(0,6,0,0)
+tl.Size = UDim2.new(1, -65, 0, 32)
+tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
-tl.Text = "SOUND SCANNER by Candybibi (0)"
-tl.TextColor3 = Color3.fromRGB(170,170,170)
-tl.TextSize = 12
+tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
+tl.TextColor3 = Color3.fromRGB(230, 230, 230)
+tl.TextSize = 10
 tl.Font = Enum.Font.Code
 tl.TextXAlignment = Enum.TextXAlignment.Left
 tl.Parent = w
 
+--// Minimal Close Button (ปุ่มปิด ×)
 local cb = Instance.new("TextButton")
-cb.Size = UDim2.new(0,24,0,24)
-cb.Position = UDim2.new(1,-24,0,0)
+cb.Size = UDim2.new(0, 24, 0, 24)
+cb.Position = UDim2.new(1, -32, 0, 4)
 cb.BackgroundTransparency = 1
-cb.Text = "x"
-cb.TextColor3 = Color3.fromRGB(100,100,100)
-cb.TextSize = 12
+cb.Text = "×"
+cb.TextColor3 = Color3.fromRGB(130, 130, 130)
+cb.TextSize = 16
 cb.Font = Enum.Font.Code
 cb.Parent = w
 
-local sp = Instance.new("Frame")
-sp.Size = UDim2.new(1,0,0,1)
-sp.Position = UDim2.new(0,0,0,24)
-sp.BackgroundColor3 = Color3.fromRGB(45,45,45)
-sp.BorderSizePixel = 0
-sp.Parent = w
+cb.MouseEnter:Connect(function() cb.TextColor3 = Color3.fromRGB(250, 100, 100) end)
+cb.MouseLeave:Connect(function() cb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
-local sl = Instance.new("TextLabel")
-sl.Size = UDim2.new(1,-8,0,14)
-sl.Position = UDim2.new(0,6,0,28)
-sl.BackgroundTransparency = 1
-sl.Text = "sources"
-sl.TextColor3 = Color3.fromRGB(90,90,90)
-sl.TextSize = 9
-sl.Font = Enum.Font.Code
-sl.TextXAlignment = Enum.TextXAlignment.Left
-sl.Parent = w
+--// [ปุ่มซ่อน GUI] Minimize Button (_)
+local mb = Instance.new("TextButton")
+mb.Size = UDim2.new(0, 24, 0, 24)
+mb.Position = UDim2.new(1, -56, 0, 4)
+mb.BackgroundTransparency = 1
+mb.Text = "_"
+mb.TextColor3 = Color3.fromRGB(130, 130, 130)
+mb.TextSize = 14
+mb.Font = Enum.Font.Code
+mb.Parent = w
 
-local yo = 43
-for _, s in next, opt do
-	local rf = Instance.new("Frame")
-	rf.Size = UDim2.new(1,-8,0,16)
-	rf.Position = UDim2.new(0,4,0,yo)
-	rf.BackgroundTransparency = 1
-	rf.Parent = w
+mb.MouseEnter:Connect(function() mb.TextColor3 = Color3.fromRGB(200, 200, 200) end)
+mb.MouseLeave:Connect(function() mb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
-	local tb = Instance.new("TextButton")
-	tb.Size = UDim2.new(0,14,0,14)
-	tb.Position = UDim2.new(0,2,0,1)
-	tb.BackgroundColor3 = s.v and Color3.fromRGB(50,70,50) or Color3.fromRGB(30,30,30)
-	tb.BorderColor3 = Color3.fromRGB(55,55,55)
-	tb.BorderSizePixel = 1
-	tb.Text = s.v and "x" or ""
-	tb.TextColor3 = Color3.fromRGB(120,180,120)
-	tb.TextSize = 10
-	tb.Font = Enum.Font.Code
-	tb.Parent = rf
-
-	local lb = Instance.new("TextLabel")
-	lb.Size = UDim2.new(1,-22,1,0)
-	lb.Position = UDim2.new(0,20,0,0)
-	lb.BackgroundTransparency = 1
-	lb.Text = s.t
-	lb.TextColor3 = Color3.fromRGB(130,130,130)
-	lb.TextSize = 10
-	lb.Font = Enum.Font.Code
-	lb.TextXAlignment = Enum.TextXAlignment.Left
-	lb.Parent = rf
-
-	tb.MouseButton1Click:Connect(function()
-		s.v = not s.v
-		tb.Text = s.v and "x" or ""
-		tb.BackgroundColor3 = s.v and Color3.fromRGB(50,70,50) or Color3.fromRGB(30,30,30)
-		if s.v then swept = false end
-	end)
-
-	yo = yo + 18
-end
-
-local sp2 = Instance.new("Frame")
-sp2.Size = UDim2.new(1,-8,0,1)
-sp2.Position = UDim2.new(0,4,0,yo+2)
-sp2.BackgroundColor3 = Color3.fromRGB(35,35,35)
-sp2.BorderSizePixel = 0
-sp2.Parent = w
-
-local by = yo + 7
-local bw = UDim2.new(1/3,-5,0,22)
-
-local sb = Instance.new("TextButton")
-sb.Size = bw
-sb.Position = UDim2.new(0,4,0,by)
-sb.BackgroundColor3 = Color3.fromRGB(30,30,30)
-sb.BorderColor3 = Color3.fromRGB(50,50,50)
-sb.BorderSizePixel = 1
-sb.Text = "scan"
-sb.TextColor3 = Color3.fromRGB(150,150,150)
-sb.TextSize = 11
-sb.Font = Enum.Font.Code
-sb.Parent = w
-
-local sv = Instance.new("TextButton")
-sv.Size = bw
-sv.Position = UDim2.new(1/3,2,0,by)
-sv.BackgroundColor3 = Color3.fromRGB(30,30,30)
-sv.BorderColor3 = Color3.fromRGB(50,50,50)
-sv.BorderSizePixel = 1
-sv.Text = "save"
-sv.TextColor3 = Color3.fromRGB(150,150,150)
-sv.TextSize = 11
-sv.Font = Enum.Font.Code
-sv.Parent = w
-
-local cl = Instance.new("TextButton")
-cl.Size = bw
-cl.Position = UDim2.new(2/3,0,0,by)
-cl.BackgroundColor3 = Color3.fromRGB(30,30,30)
-cl.BorderColor3 = Color3.fromRGB(50,50,50)
-cl.BorderSizePixel = 1
-cl.Text = "clear"
-cl.TextColor3 = Color3.fromRGB(150,150,150)
-cl.TextSize = 11
-cl.Font = Enum.Font.Code
-cl.Parent = w
-
-local sy = by + 26
+--// Scrolling List Frame
 local sf = Instance.new("ScrollingFrame")
-sf.Size = UDim2.new(1,-8,1,-(sy+4))
-sf.Position = UDim2.new(0,4,0,sy)
-sf.BackgroundColor3 = Color3.fromRGB(15,15,15)
-sf.BorderColor3 = Color3.fromRGB(40,40,40)
-sf.BorderSizePixel = 1
-sf.ScrollBarThickness = 3
-sf.ScrollBarImageColor3 = Color3.fromRGB(60,60,60)
-sf.CanvasSize = UDim2.new(0,0,0,0)
+sf.Size = UDim2.new(1, -24, 1, -80)
+sf.Position = UDim2.new(0, 12, 0, 36)
+sf.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+sf.BorderSizePixel = 0
+sf.ScrollBarThickness = 2
+sf.ScrollBarImageColor3 = Color3.fromRGB(45, 45, 45)
+sf.CanvasSize = UDim2.new(0, 0, 0, 0)
 sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
 sf.Parent = w
 
-Instance.new("UIListLayout", sf).Padding = UDim.new(0,1)
+local sfCorner = Instance.new("UICorner", sf)
+sfCorner.CornerRadius = UDim.new(0, 4)
 
---// ปรับปรุงฟังก์ชันสร้างแถวแสดงผล (โชว์ ชื่อ [ID] + ปุ่มคู่ id & link)
+local sfStroke = Instance.new("UIStroke", sf)
+sfStroke.Color = Color3.fromRGB(25, 25, 25)
+sfStroke.Thickness = 1
+
+Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
+
+--// Action Buttons Setup
+local abFrame = Instance.new("Frame")
+abFrame.Size = UDim2.new(1, -24, 0, 30)
+abFrame.Position = UDim2.new(0, 12, 1, -38)
+abFrame.BackgroundTransparency = 1
+abFrame.Parent = w
+
+local function styleBtn(text, posX)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.5, -4, 1, 0)
+	btn.Position = UDim2.new(posX, posX == 0 and 0 or 4, 0, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	btn.BorderSizePixel = 0
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(170, 170, 170)
+	btn.TextSize = 11
+	btn.Font = Enum.Font.Code
+	btn.Parent = abFrame
+
+	local bCorner = Instance.new("UICorner", btn)
+	bCorner.CornerRadius = UDim.new(0, 5)
+
+	local bStroke = Instance.new("UIStroke", btn)
+	bStroke.Color = Color3.fromRGB(40, 40, 40)
+	bStroke.Thickness = 1
+
+	return btn, bStroke
+end
+
+local sb, sbStroke = styleBtn("scan", 0)
+local cl, clStroke = styleBtn("clear", 0.5)
+
+-- Button Hover Effects
+sb.MouseEnter:Connect(function() if not sc then sbStroke.Color = Color3.fromRGB(60, 60, 60) sb.TextColor3 = Color3.fromRGB(210, 210, 210) end end)
+sb.MouseLeave:Connect(function() if not sc then sbStroke.Color = Color3.fromRGB(40, 40, 40) sb.TextColor3 = Color3.fromRGB(170, 170, 170) end end)
+cl.MouseEnter:Connect(function() clStroke.Color = Color3.fromRGB(60, 60, 60) cl.TextColor3 = Color3.fromRGB(210, 210, 210) end)
+cl.MouseLeave:Connect(function() clStroke.Color = Color3.fromRGB(40, 40, 40) cl.TextColor3 = Color3.fromRGB(170, 170, 170) end)
+
+--// Full GUI Show / Hide Logic
+mb.MouseButton1Click:Connect(function()
+	w.Visible = false
+	openBtn.Visible = true
+end)
+
+openBtn.MouseButton1Click:Connect(function()
+	openBtn.Visible = false
+	w.Visible = true
+end)
+
+--// Modern Row Element Creator (แก้ไขให้รับค่า nm กลับมาใส่ใน UI แล้ว)
 local function mr(id, nm)
 	local u = "https://create.roblox.com/store/asset/" .. id
 	local e = Instance.new("Frame")
-	e.Size = UDim2.new(1,0,0,28)
-	e.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	e.Size = UDim2.new(1, 0, 0, 30)
+	e.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
 	e.BorderSizePixel = 0
 	e.Parent = sf
 
+	local eCorner = Instance.new("UICorner", e)
+	eCorner.CornerRadius = UDim.new(0, 4)
+
 	local d = Instance.new("TextLabel")
 	d.Name = "d"
-	d.Size = UDim2.new(0,10,1,0)
-	d.Position = UDim2.new(0,2,0,0)
+	d.Size = UDim2.new(0, 14, 1, 0)
+	d.Position = UDim2.new(0, 8, 0, 0)
 	d.BackgroundTransparency = 1
-	d.Text = ">"
-	d.TextColor3 = Color3.fromRGB(80,180,80)
+	d.Text = ""
+	d.TextColor3 = Color3.fromRGB(85, 185, 105)
 	d.TextSize = 10
 	d.Font = Enum.Font.Code
 	d.Parent = e
 
 	local l = Instance.new("TextLabel")
-	l.Size = UDim2.new(1,-100,1,0) -- ปรับขนาดลดลงเล็กน้อยให้ไม่ทับปุ่มคู่ด้านขวา
-	l.Position = UDim2.new(0,14,0,0)
+	l.Size = UDim2.new(1, -66, 1, 0)
+	l.Position = UDim2.new(0, 22, 0, 0)
 	l.BackgroundTransparency = 1
-	l.Text = nm .." [".. id .. "]"
-	l.TextColor3 = Color3.fromRGB(140,140,140)
+	l.Text = nm .. " [" .. id .. "]" -- << แสดงชื่อวัตถุคู่กับ ID เรียบร้อย
+	l.TextColor3 = Color3.fromRGB(150, 150, 150)
 	l.TextSize = 10
 	l.Font = Enum.Font.Code
 	l.TextXAlignment = Enum.TextXAlignment.Left
 	l.TextTruncate = Enum.TextTruncate.AtEnd
 	l.Parent = e
 
-	-- ปุ่ม id (คัดลอกเฉพาะเลขไอดีล้วน)
-	local bId = Instance.new("TextButton")
-	bId.Size = UDim2.new(0,38,0,18)
-	bId.Position = UDim2.new(1,-84,0.5,-9)
-	bId.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	bId.BorderColor3 = Color3.fromRGB(50,50,50)
-	bId.BorderSizePixel = 1
-	bId.Text = "id"
-	bId.TextColor3 = Color3.fromRGB(120,120,120)
-	bId.TextSize = 10
-	bId.Font = Enum.Font.Code
-	bId.Parent = e
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(0, 38, 0, 18)
+	b.Position = UDim2.new(1, -44, 0.5, -9)
+	b.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+	b.BorderSizePixel = 0
+	b.Text = "copy"
+	b.TextColor3 = Color3.fromRGB(130, 130, 130)
+	b.TextSize = 10
+	b.Font = Enum.Font.Code
+	b.Parent = e
 
-	-- ปุ่ม link (คัดลอกเป็น URL ลิงก์เต็ม)
-	local bLink = Instance.new("TextButton")
-	bLink.Size = UDim2.new(0,38,0,18)
-	bLink.Position = UDim2.new(1,-42,0.5,-9)
-	bLink.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	bLink.BorderColor3 = Color3.fromRGB(50,50,50)
-	bLink.BorderSizePixel = 1
-	bLink.Text = "link"
-	bLink.TextColor3 = Color3.fromRGB(120,120,120)
-	bLink.TextSize = 10
-	bLink.Font = Enum.Font.Code
-	bLink.Parent = e
+	local bCorner = Instance.new("UICorner", b)
+	bCorner.CornerRadius = UDim.new(0, 3)
+	
+	local bStroke = Instance.new("UIStroke", b)
+	bStroke.Color = Color3.fromRGB(40, 40, 40)
+	bStroke.Thickness = 1
 
-	bId.MouseButton1Click:Connect(function()
-		setclipboard(id)
-		bId.Text = "ok"
-		task.delay(0.8, function()
-			if bId.Parent then bId.Text = "id" end
-		end)
-	end)
-
-	bLink.MouseButton1Click:Connect(function()
+	b.MouseButton1Click:Connect(function()
 		setclipboard(u)
-		bLink.Text = "ok"
+		b.Text = "ok"
+		b.TextColor3 = Color3.fromRGB(85, 185, 105)
+		bStroke.Color = Color3.fromRGB(45, 85, 55)
 		task.delay(0.8, function()
-			if bLink.Parent then bLink.Text = "link" end
+			if b.Parent then 
+				b.Text = "copy" 
+				b.TextColor3 = Color3.fromRGB(130, 130, 130)
+				bStroke.Color = Color3.fromRGB(40, 40, 40)
+			end
 		end)
 	end)
-
 	return e
 end
 
+--// Core Logic Setup
 local function ta(obj)
 	if not on then return end
 	if typeof(obj) ~= "Instance" then return end
@@ -280,21 +264,16 @@ local function ta(obj)
 	pcall(function() nm = obj.Name end)
 
 	f[num] = {n = nm, o = obj}
-	r[num] = mr(num, nm)
+	r[num] = mr(num, nm) -- << ส่งค่าทั้ง ID และ Name เข้าฟังก์ชันสร้างแถว
 	cnt = cnt + 1
 	tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
-end
-
-local function chk(k)
-	for _, x in next, opt do
-		if x.k == k then return x.v end
-	end
 end
 
 local function dosweep()
 	local i = 0
 
-	if chk("g") and sc then
+	-- Game Descendants
+	if sc then
 		local d = game:GetDescendants()
 		for j = 1, #d do
 			if not sc then return end
@@ -309,7 +288,8 @@ local function dosweep()
 		task.wait()
 	end
 
-	if chk("n") and sc then
+	-- Nil Instances
+	if sc then
 		pcall(function()
 			local ni = getnilinstances()
 			for j = 1, #ni do
@@ -324,7 +304,8 @@ local function dosweep()
 		task.wait()
 	end
 
-	if chk("m") and sc then
+	-- Loaded Modules
+	if sc then
 		pcall(function()
 			local md = getloadedmodules()
 			for j = 1, #md do
@@ -347,39 +328,6 @@ local function dosweep()
 		task.wait()
 	end
 
-	if chk("a") and sc then
-		pcall(function()
-			local al = getinstances()
-			for j = 1, #al do
-				if not sc then return end
-				pcall(function()
-					if al[j]:IsA("Sound") then ta(al[j]) end
-				end)
-				i = i + 1
-				if i % 300 == 0 then task.wait() end
-			end
-			al = nil
-		end)
-		task.wait()
-	end
-
-	if chk("c") and sc then
-		pcall(function()
-			local gc = getgc(true)
-			for j = 1, #gc do
-				if not sc then return end
-				if typeof(gc[j]) == "Instance" then
-					pcall(function()
-						if gc[j]:IsA("Sound") then ta(gc[j]) end
-					end)
-				end
-				i = i + 1
-				if i % 600 == 0 then task.wait() end
-			end
-			gc = nil
-		end)
-	end
-
 	if sc then swept = true end
 end
 
@@ -390,7 +338,7 @@ local function upd()
 		local dt = row:FindFirstChild("d")
 		if dt then
 			local ok, p = pcall(function() return f[k].o and f[k].o.IsPlaying end)
-			dt.Text = (ok and p) and ">" or ""
+			dt.Text = (ok and p) and "▶" or ""
 		end
 		i = i + 1
 		if i % 120 == 0 then task.wait() end
@@ -438,33 +386,13 @@ cl.MouseButton1Click:Connect(function()
 	tl.Text = "SOUND SCANNER by Candybibi (0)"
 end)
 
-sv.MouseButton1Click:Connect(function()
-	if cnt == 0 then
-		sv.Text = "empty"
-		task.delay(0.8, function() if sv.Parent then sv.Text = "save" end end)
-		return
-	end
-	local ln = {}
-	for num, data in next, f do
-		ln[#ln+1] = data.n .. " | https://create.roblox.com/store/asset/" .. num
-	end
-	table.sort(ln)
-	local ok = pcall(function()
-		local gn = ms:GetProductInfo(game.PlaceId).Name
-		gn = gn:gsub("[^%w%s%-_]",""):gsub("%s+","_")
-		makefolder("SoundScanner")
-		writefile("SoundScanner/" .. gn .. ".txt", table.concat(ln, "\n"))
-	end)
-	sv.Text = ok and "saved" or "error"
-	task.delay(1, function() if sv.Parent then sv.Text = "save" end end)
-end)
-
 sb.MouseButton1Click:Connect(function()
 	sc = not sc
 	if sc then
 		sb.Text = "stop"
-		sb.BackgroundColor3 = Color3.fromRGB(40,25,25)
-		sb.BorderColor3 = Color3.fromRGB(70,40,40)
+		sb.TextColor3 = Color3.fromRGB(240, 110, 110)
+		sb.BackgroundColor3 = Color3.fromRGB(35, 20, 20)
+		sbStroke.Color = Color3.fromRGB(90, 40, 40)
 		print("Scanning for sounds....")
 		if not swept then
 			task.spawn(dosweep)
@@ -472,12 +400,12 @@ sb.MouseButton1Click:Connect(function()
 	else
 		print("Stopped scanning. Found " .. cnt .. " sounds.")
 		sb.Text = "scan"
-		sb.BackgroundColor3 = Color3.fromRGB(30,30,30)
-		sb.BorderColor3 = Color3.fromRGB(50,50,50)
+		sb.TextColor3 = Color3.fromRGB(170, 170, 170)
+		sb.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+		sbStroke.Color = Color3.fromRGB(40, 40, 40)
 	end
 end)
 
---// บรรทัดสั่งเริ่มทำงานลูปเช็คสถานะเล่นเสียง
 task.spawn(function()
 	while on and g.Parent do
 		if sc then upd() end
