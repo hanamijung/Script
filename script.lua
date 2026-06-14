@@ -1,6 +1,6 @@
 --[[
     ================================================================
-    TITLE: MODERN SOUND SCANNER
+    TITLE: MODERN SOUND SCANNER (WITH TOGGLE PANEL)
     DESCRIPTION: Clean & Minimalist Dark Theme Sound Scanner for Roblox
     ================================================================
 --]]
@@ -55,7 +55,7 @@ wStroke.Thickness = 1
 
 --// Top Bar Title
 local tl = Instance.new("TextLabel")
-tl.Size = UDim2.new(1, -30, 0, 32)
+tl.Size = UDim2.new(1, -60, 0, 32)
 tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
 tl.Text = "SOUND SCANNER (0)"
@@ -79,26 +79,48 @@ cb.Parent = w
 cb.MouseEnter:Connect(function() cb.TextColor3 = Color3.fromRGB(250, 100, 100) end)
 cb.MouseLeave:Connect(function() cb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
+--// Toggle Panel Button (ปุ่มซ่อน/แสดงแท็บ)
+local tg = Instance.new("TextButton")
+tg.Size = UDim2.new(0, 24, 0, 24)
+tg.Position = UDim2.new(1, -56, 0, 4)
+tg.BackgroundTransparency = 1
+tg.Text = "−"
+tg.TextColor3 = Color3.fromRGB(130, 130, 130)
+tg.TextSize = 14
+tg.Font = Enum.Font.Code
+tg.Parent = w
+
+tg.MouseEnter:Connect(function() tg.TextColor3 = Color3.fromRGB(200, 200, 200) end)
+tg.MouseLeave:Connect(function() tg.TextColor3 = Color3.fromRGB(130, 130, 130) end)
+
+--// Collapsible Source Panel Group Frame
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(1, 0, 0, 140)
+panel.Position = UDim2.new(0, 0, 0, 32)
+panel.BackgroundTransparency = 1
+panel.ClipsDescendants = true
+panel.Parent = w
+
 --// Subtitle
 local sl = Instance.new("TextLabel")
 sl.Size = UDim2.new(1, -24, 0, 14)
-sl.Position = UDim2.new(0, 12, 0, 36)
+sl.Position = UDim2.new(0, 12, 0, 4)
 sl.BackgroundTransparency = 1
 sl.Text = "SOURCES"
 sl.TextColor3 = Color3.fromRGB(100, 100, 100)
 sl.TextSize = 9
 sl.Font = Enum.Font.Code
 sl.TextXAlignment = Enum.TextXAlignment.Left
-sl.Parent = w
+sl.Parent = panel
 
 --// Options Render Loop
-local yo = 54
+local yo = 22
 for _, s in next, opt do
 	local rf = Instance.new("Frame")
 	rf.Size = UDim2.new(1, -24, 0, 22)
 	rf.Position = UDim2.new(0, 12, 0, yo)
 	rf.BackgroundTransparency = 1
-	rf.Parent = w
+	rf.Parent = panel
 
 	local tb = Instance.new("TextButton")
 	tb.Size = UDim2.new(0, 14, 0, 14)
@@ -137,21 +159,25 @@ for _, s in next, opt do
 	yo = yo + 24
 end
 
---// Action Buttons Layout
-local by = yo + 8
+--// Action Buttons Setup
 local bw = UDim2.new(1/3, -6, 0, 26)
+local abFrame = Instance.new("Frame")
+abFrame.Size = UDim2.new(1, 0, 0, 26)
+abFrame.Position = UDim2.new(0, 0, 0, 180)
+abFrame.BackgroundTransparency = 1
+abFrame.Parent = w
 
 local function styleActionBtn(text, posX)
 	local btn = Instance.new("TextButton")
 	btn.Size = bw
-	btn.Position = UDim2.new(posX, posX == 0 and 12 or (posX == 1/3 and 3 or -6), 0, by)
+	btn.Position = UDim2.new(posX, posX == 0 and 12 or (posX == 1/3 and 3 or -6), 0, 0)
 	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 	btn.BorderSizePixel = 0
 	btn.Text = text
 	btn.TextColor3 = Color3.fromRGB(170, 170, 170)
 	btn.TextSize = 11
 	btn.Font = Enum.Font.Code
-	btn.Parent = w
+	btn.Parent = abFrame
 
 	local bCorner = Instance.new("UICorner", btn)
 	bCorner.CornerRadius = UDim.new(0, 4)
@@ -171,10 +197,9 @@ local sv, svStroke = styleActionBtn("save", 1/3)
 local cl, clStroke = styleActionBtn("clear", 2/3)
 
 --// Scrolling List Frame
-local sy = by + 36
 local sf = Instance.new("ScrollingFrame")
-sf.Size = UDim2.new(1, -24, 1, -(sy + 12))
-sf.Position = UDim2.new(0, 12, 0, sy)
+sf.Size = UDim2.new(1, -24, 1, -218)
+sf.Position = UDim2.new(0, 12, 0, 218)
 sf.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 sf.BorderSizePixel = 0
 sf.ScrollBarThickness = 2
@@ -191,6 +216,25 @@ sfStroke.Color = Color3.fromRGB(25, 25, 25)
 sfStroke.Thickness = 1
 
 Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
+
+--// Toggle Animation Logic
+local isFolded = false
+tg.MouseButton1Click:Connect(function()
+	isFolded = not isFolded
+	if isFolded then
+		tg.Text = "+"
+		panel.Visible = false
+		abFrame.Position = UDim2.new(0, 0, 0, 40)
+		sf.Position = UDim2.new(0, 12, 0, 78)
+		sf.Size = UDim2.new(1, -24, 1, -90)
+	else
+		tg.Text = "−"
+		panel.Visible = true
+		abFrame.Position = UDim2.new(0, 0, 0, 180)
+		sf.Position = UDim2.new(0, 12, 0, 218)
+		sf.Size = UDim2.new(1, -24, 1, -230)
+	end
+end)
 
 --// Modern Row Element Creator
 local function mr(id, nm)
