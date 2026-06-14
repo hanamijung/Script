@@ -1,6 +1,6 @@
 --[[
     ================================================================
-    TITLE: MODERN SOUND SCANNER (COMPUTE VERSION)
+    TITLE: MODERN SOUND SCANNER (CANDYBIBI EDITION)
     DESCRIPTION: Clean & Minimalist Dark Theme Sound Scanner with Toggle GUI
     ================================================================
 --]]
@@ -76,14 +76,14 @@ obStroke.Thickness = 1
 openBtn.MouseEnter:Connect(function() obStroke.Color = Color3.fromRGB(70, 70, 70) openBtn.TextColor3 = Color3.fromRGB(230, 230, 230) end)
 openBtn.MouseLeave:Connect(function() obStroke.Color = Color3.fromRGB(45, 45, 45) openBtn.TextColor3 = Color3.fromRGB(180, 180, 180) end)
 
---// Top Bar Title
+--// Top Bar Title (อัปเดตชื่อเครดิตแล้ว)
 local tl = Instance.new("TextLabel")
-tl.Size = UDim2.new(1, -85, 0, 32)
+tl.Size = UDim2.new(1, -65, 0, 32)
 tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
-tl.Text = "SOUND SCANNER by Candybibi (0)"
+tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 tl.TextColor3 = Color3.fromRGB(230, 230, 230)
-tl.TextSize = 11
+tl.TextSize = 10 -- ปรับขนาดตัวอักษรลงเล็กน้อยเพื่อให้ชื่อยาวๆ แสดงผลได้ครบถ้วนสวยงาม
 tl.Font = Enum.Font.Code
 tl.TextXAlignment = Enum.TextXAlignment.Left
 tl.Parent = w
@@ -107,7 +107,7 @@ local mb = Instance.new("TextButton")
 mb.Size = UDim2.new(0, 24, 0, 24)
 mb.Position = UDim2.new(1, -56, 0, 4)
 mb.BackgroundTransparency = 1
-mb.Text = "_"
+mb.Text = "-"
 mb.TextColor3 = Color3.fromRGB(130, 130, 130)
 mb.TextSize = 14
 mb.Font = Enum.Font.Code
@@ -116,26 +116,11 @@ mb.Parent = w
 mb.MouseEnter:Connect(function() mb.TextColor3 = Color3.fromRGB(200, 200, 200) end)
 mb.MouseLeave:Connect(function() mb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
---// [ปุ่มหดแท็บ Sources] Toggle Panel Button (ตัว -)
-local tg = Instance.new("TextButton")
-tg.Size = UDim2.new(0, 24, 0, 24)
-tg.Position = UDim2.new(1, -80, 0, 4)
-tg.BackgroundTransparency = 1
-tg.Text = "−"
-tg.TextColor3 = Color3.fromRGB(130, 130, 130)
-tg.TextSize = 14
-tg.Font = Enum.Font.Code
-tg.Parent = w
-
-tg.MouseEnter:Connect(function() tg.TextColor3 = Color3.fromRGB(200, 200, 200) end)
-tg.MouseLeave:Connect(function() tg.TextColor3 = Color3.fromRGB(130, 130, 130) end)
-
---// Collapsible Source Panel Group Frame
+--// Source Panel Group Frame
 local panel = Instance.new("Frame")
 panel.Size = UDim2.new(1, 0, 0, 140)
 panel.Position = UDim2.new(0, 0, 0, 32)
 panel.BackgroundTransparency = 1
-panel.ClipsDescendants = true
 panel.Parent = w
 
 --// Subtitle
@@ -254,26 +239,7 @@ sfStroke.Thickness = 1
 
 Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
 
---// Toggle Sources Animation Logic
-local isFolded = false
-tg.MouseButton1Click:Connect(function()
-	isFolded = not isFolded
-	if isFolded then
-		tg.Text = "+"
-		panel.Visible = false
-		abFrame.Position = UDim2.new(0, 0, 0, 40)
-		sf.Position = UDim2.new(0, 12, 0, 78)
-		sf.Size = UDim2.new(1, -24, 1, -90)
-	else
-		tg.Text = "−"
-		panel.Visible = true
-		abFrame.Position = UDim2.new(0, 0, 0, 180)
-		sf.Position = UDim2.new(0, 12, 0, 218)
-		sf.Size = UDim2.new(1, -24, 1, -230)
-	end
-end)
-
---// Full GUI Show / Hide Logic (ระบบปุ่มซ่อนทั้งหมด)
+--// Full GUI Show / Hide Logic
 mb.MouseButton1Click:Connect(function()
 	w.Visible = false
 	openBtn.Visible = true
@@ -372,7 +338,7 @@ local function ta(obj)
 	f[num] = {n = nm, o = obj}
 	r[num] = mr(num, nm)
 	cnt = cnt + 1
-	tl.Text = "SOUND SCANNER (" .. cnt .. ")"
+	tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 end
 
 local function chk(k)
@@ -525,7 +491,7 @@ cl.MouseButton1Click:Connect(function()
 	r = {}
 	cnt = 0
 	swept = false
-	tl.Text = "SOUND SCANNER (0)"
+	tl.Text = "SOUND SCANNER by Candybibi (0)"
 end)
 
 sv.MouseButton1Click:Connect(function()
