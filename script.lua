@@ -1,7 +1,7 @@
---[[
+-- [[
     ================================================================
-    TITLE: ULTRA MINIMAL SOUND SCANNER (CANDYBIBI EDITION)
-    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + ID Only
+    TITLE: MINIMAL SOUND SCANNER (CANDYBIBI EDITION)
+    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + Original Row Format
     ================================================================
 --]]
 
@@ -28,10 +28,10 @@ for _,x in pairs(gethui():GetChildren()) do
 	end
 end
 
---// Modern Compact Window Frame
+--// Modern Compact Window Frame (ขยายความกว้างกลับเป็น 310 เพื่อรองรับชื่อยาวๆ แบบเดิม)
 local w = Instance.new("Frame")
-w.Size = UDim2.new(0, 260, 0, 320)
-w.Position = UDim2.new(0.5, -130, 0.5, -160)
+w.Size = UDim2.new(0, 310, 0, 320)
+w.Position = UDim2.new(0.5, -155, 0.5, -160)
 w.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 w.BorderSizePixel = 0
 w.Active = true
@@ -75,7 +75,7 @@ tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
 tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 tl.TextColor3 = Color3.fromRGB(230, 230, 230)
-tl.TextSize = 9.5
+tl.TextSize = 10
 tl.Font = Enum.Font.Code
 tl.TextXAlignment = Enum.TextXAlignment.Left
 tl.Parent = w
@@ -129,7 +129,7 @@ sfStroke.Thickness = 1
 
 Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
 
---// Action Buttons Setup (แบ่งครึ่งซ้าย-ขวาเท่ากันอย่างสวยงาม)
+--// Action Buttons Setup
 local abFrame = Instance.new("Frame")
 abFrame.Size = UDim2.new(1, -24, 0, 30)
 abFrame.Position = UDim2.new(0, 12, 1, -38)
@@ -138,7 +138,7 @@ abFrame.Parent = w
 
 local function styleBtn(text, posX)
 	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0.5, -4, 1, 0) -- แบ่งคนละ 50% หักช่องว่างตรงกลางออกนิดหน่อย
+	btn.Size = UDim2.new(0.5, -4, 1, 0)
 	btn.Position = UDim2.new(posX, posX == 0 and 0 or 4, 0, 0)
 	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 	btn.BorderSizePixel = 0
@@ -178,8 +178,8 @@ openBtn.MouseButton1Click:Connect(function()
 	w.Visible = true
 end)
 
---// Modern Row Element Creator (ID Only)
-local function mr(id)
+--// Modern Row Element Creator (ปรับกลับมาโชว์แบบเดิม: ชื่อวัตถุ [ID])
+local function mr(id, nm)
 	local u = "https://create.roblox.com/store/asset/" .. id
 	local e = Instance.new("Frame")
 	e.Size = UDim2.new(1, 0, 0, 30)
@@ -205,11 +205,12 @@ local function mr(id)
 	l.Size = UDim2.new(1, -66, 1, 0)
 	l.Position = UDim2.new(0, 22, 0, 0)
 	l.BackgroundTransparency = 1
-	l.Text = id
-	l.TextColor3 = Color3.fromRGB(160, 160, 160)
-	l.TextSize = 10.5
+	l.Text = nm .. " [" .. id .. "]" -- << แสดงกลับเป็นชื่อเดิมแบบที่คุณต้องการ
+	l.TextColor3 = Color3.fromRGB(150, 150, 150)
+	l.TextSize = 10
 	l.Font = Enum.Font.Code
 	l.TextXAlignment = Enum.TextXAlignment.Left
+	l.TextTruncate = Enum.TextTruncate.AtEnd
 	l.Parent = e
 
 	local b = Instance.new("TextButton")
@@ -259,8 +260,11 @@ local function ta(obj)
 	local num = sid:match("(%d+)")
 	if not num or f[num] then return end
 
-	f[num] = {o = obj}
-	r[num] = mr(num)
+	local nm = "Unknown"
+	pcall(function() nm = obj.Name end)
+
+	f[num] = {n = nm, o = obj}
+	r[num] = mr(num, nm)
 	cnt = cnt + 1
 	tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 end
