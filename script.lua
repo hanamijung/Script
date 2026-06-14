@@ -1,7 +1,7 @@
 --[[
     ================================================================
-    TITLE: MODERN SOUND SCANNER (CANDYBIBI EDITION)
-    DESCRIPTION: Clean & Minimalist Dark Theme Sound Scanner with Toggle GUI
+    TITLE: ULTRA MINIMAL SOUND SCANNER (CANDYBIBI EDITION)
+    DESCRIPTION: Clean Dark Theme with Scan & Clear Buttons + ID Only
     ================================================================
 --]]
 
@@ -16,14 +16,6 @@ local f = {}
 local r = {}
 local cn = {}
 
-local opt = {
-	{k="g", t="Game Tree", v=true},
-	{k="n", t="Nil Instances", v=true},
-	{k="m", t="Modules", v=true},
-	{k="c", t="Garbage Collector", v=false},
-	{k="a", t="All Instances", v=false},
-}
-
 --// Main GUI Base
 local g = Instance.new("ScreenGui")
 g.Name = string.char(math.random(97,122)) .. math.random(10000,99999)
@@ -36,10 +28,10 @@ for _,x in pairs(gethui():GetChildren()) do
 	end
 end
 
---// Modern Window Frame (หน้าต่างหลัก)
+--// Modern Compact Window Frame
 local w = Instance.new("Frame")
-w.Size = UDim2.new(0, 310, 0, 440)
-w.Position = UDim2.new(0.5, -155, 0.5, -220)
+w.Size = UDim2.new(0, 260, 0, 320)
+w.Position = UDim2.new(0.5, -130, 0.5, -160)
 w.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 w.BorderSizePixel = 0
 w.Active = true
@@ -56,7 +48,7 @@ wStroke.Thickness = 1
 --// [ปุ่มเปิดตอนซ่อน] Small Open Button 
 local openBtn = Instance.new("TextButton")
 openBtn.Size = UDim2.new(0, 60, 0, 30)
-openBtn.Position = UDim2.new(0, 10, 0.5, -15) -- อยู่ฝั่งซ้ายกลางจอ
+openBtn.Position = UDim2.new(0, 10, 0.5, -15)
 openBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 openBtn.BorderSizePixel = 0
 openBtn.Text = "Open"
@@ -76,19 +68,19 @@ obStroke.Thickness = 1
 openBtn.MouseEnter:Connect(function() obStroke.Color = Color3.fromRGB(70, 70, 70) openBtn.TextColor3 = Color3.fromRGB(230, 230, 230) end)
 openBtn.MouseLeave:Connect(function() obStroke.Color = Color3.fromRGB(45, 45, 45) openBtn.TextColor3 = Color3.fromRGB(180, 180, 180) end)
 
---// Top Bar Title (อัปเดตชื่อเครดิตแล้ว)
+--// Top Bar Title
 local tl = Instance.new("TextLabel")
 tl.Size = UDim2.new(1, -65, 0, 32)
 tl.Position = UDim2.new(0, 12, 0, 0)
 tl.BackgroundTransparency = 1
 tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
 tl.TextColor3 = Color3.fromRGB(230, 230, 230)
-tl.TextSize = 10 -- ปรับขนาดตัวอักษรลงเล็กน้อยเพื่อให้ชื่อยาวๆ แสดงผลได้ครบถ้วนสวยงาม
+tl.TextSize = 9.5
 tl.Font = Enum.Font.Code
 tl.TextXAlignment = Enum.TextXAlignment.Left
 tl.Parent = w
 
---// Minimal Close Button (ปุ่มปิด X)
+--// Minimal Close Button (ปุ่มปิด ×)
 local cb = Instance.new("TextButton")
 cb.Size = UDim2.new(0, 24, 0, 24)
 cb.Position = UDim2.new(1, -32, 0, 4)
@@ -107,7 +99,7 @@ local mb = Instance.new("TextButton")
 mb.Size = UDim2.new(0, 24, 0, 24)
 mb.Position = UDim2.new(1, -56, 0, 4)
 mb.BackgroundTransparency = 1
-mb.Text = "-"
+mb.Text = "_"
 mb.TextColor3 = Color3.fromRGB(130, 130, 130)
 mb.TextSize = 14
 mb.Font = Enum.Font.Code
@@ -116,112 +108,10 @@ mb.Parent = w
 mb.MouseEnter:Connect(function() mb.TextColor3 = Color3.fromRGB(200, 200, 200) end)
 mb.MouseLeave:Connect(function() mb.TextColor3 = Color3.fromRGB(130, 130, 130) end)
 
---// Source Panel Group Frame
-local panel = Instance.new("Frame")
-panel.Size = UDim2.new(1, 0, 0, 140)
-panel.Position = UDim2.new(0, 0, 0, 32)
-panel.BackgroundTransparency = 1
-panel.Parent = w
-
---// Subtitle
-local sl = Instance.new("TextLabel")
-sl.Size = UDim2.new(1, -24, 0, 14)
-sl.Position = UDim2.new(0, 12, 0, 4)
-sl.BackgroundTransparency = 1
-sl.Text = "SOURCES"
-sl.TextColor3 = Color3.fromRGB(100, 100, 100)
-sl.TextSize = 9
-sl.Font = Enum.Font.Code
-sl.TextXAlignment = Enum.TextXAlignment.Left
-sl.Parent = panel
-
---// Options Render Loop
-local yo = 22
-for _, s in next, opt do
-	local rf = Instance.new("Frame")
-	rf.Size = UDim2.new(1, -24, 0, 22)
-	rf.Position = UDim2.new(0, 12, 0, yo)
-	rf.BackgroundTransparency = 1
-	rf.Parent = panel
-
-	local tb = Instance.new("TextButton")
-	tb.Size = UDim2.new(0, 14, 0, 14)
-	tb.Position = UDim2.new(0, 0, 0.5, -7)
-	tb.BackgroundColor3 = s.v and Color3.fromRGB(45, 85, 55) or Color3.fromRGB(25, 25, 25)
-	tb.BorderSizePixel = 0
-	tb.Text = ""
-	tb.Parent = rf
-
-	local tbCorner = Instance.new("UICorner", tb)
-	tbCorner.CornerRadius = UDim.new(0, 3)
-	
-	local tbStroke = Instance.new("UIStroke", tb)
-	tbStroke.Color = s.v and Color3.fromRGB(60, 120, 75) or Color3.fromRGB(40, 40, 40)
-	tbStroke.Thickness = 1
-
-	local lb = Instance.new("TextLabel")
-	lb.Size = UDim2.new(1, -24, 1, 0)
-	lb.Position = UDim2.new(0, 22, 0, 0)
-	lb.BackgroundTransparency = 1
-	lb.Text = s.t
-	lb.TextColor3 = s.v and Color3.fromRGB(180, 180, 180) or Color3.fromRGB(130, 130, 130)
-	lb.TextSize = 11
-	lb.Font = Enum.Font.Code
-	lb.TextXAlignment = Enum.TextXAlignment.Left
-	lb.Parent = rf
-
-	tb.MouseButton1Click:Connect(function()
-		s.v = not s.v
-		tb.BackgroundColor3 = s.v and Color3.fromRGB(45, 85, 55) or Color3.fromRGB(25, 25, 25)
-		tbStroke.Color = s.v and Color3.fromRGB(60, 120, 75) or Color3.fromRGB(40, 40, 40)
-		lb.TextColor3 = s.v and Color3.fromRGB(180, 180, 180) or Color3.fromRGB(130, 130, 130)
-		if s.v then swept = false end
-	end)
-
-	yo = yo + 24
-end
-
---// Action Buttons Setup
-local bw = UDim2.new(1/3, -6, 0, 26)
-local abFrame = Instance.new("Frame")
-abFrame.Size = UDim2.new(1, 0, 0, 26)
-abFrame.Position = UDim2.new(0, 0, 0, 180)
-abFrame.BackgroundTransparency = 1
-abFrame.Parent = w
-
-local function styleActionBtn(text, posX)
-	local btn = Instance.new("TextButton")
-	btn.Size = bw
-	btn.Position = UDim2.new(posX, posX == 0 and 12 or (posX == 1/3 and 3 or -6), 0, 0)
-	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-	btn.BorderSizePixel = 0
-	btn.Text = text
-	btn.TextColor3 = Color3.fromRGB(170, 170, 170)
-	btn.TextSize = 11
-	btn.Font = Enum.Font.Code
-	btn.Parent = abFrame
-
-	local bCorner = Instance.new("UICorner", btn)
-	bCorner.CornerRadius = UDim.new(0, 4)
-
-	local bStroke = Instance.new("UIStroke", btn)
-	bStroke.Color = Color3.fromRGB(40, 40, 40)
-	bStroke.Thickness = 1
-
-	btn.MouseEnter:Connect(function() bStroke.Color = Color3.fromRGB(60, 60, 60) btn.TextColor3 = Color3.fromRGB(210, 210, 210) end)
-	btn.MouseLeave:Connect(function() bStroke.Color = Color3.fromRGB(40, 40, 40) btn.TextColor3 = Color3.fromRGB(170, 170, 170) end)
-	
-	return btn, bStroke
-end
-
-local sb, sbStroke = styleActionBtn("scan", 0)
-local sv, svStroke = styleActionBtn("save", 1/3)
-local cl, clStroke = styleActionBtn("clear", 2/3)
-
 --// Scrolling List Frame
 local sf = Instance.new("ScrollingFrame")
-sf.Size = UDim2.new(1, -24, 1, -218)
-sf.Position = UDim2.new(0, 12, 0, 218)
+sf.Size = UDim2.new(1, -24, 1, -80)
+sf.Position = UDim2.new(0, 12, 0, 36)
 sf.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 sf.BorderSizePixel = 0
 sf.ScrollBarThickness = 2
@@ -239,6 +129,44 @@ sfStroke.Thickness = 1
 
 Instance.new("UIListLayout", sf).Padding = UDim.new(0, 2)
 
+--// Action Buttons Setup (แบ่งครึ่งซ้าย-ขวาเท่ากันอย่างสวยงาม)
+local abFrame = Instance.new("Frame")
+abFrame.Size = UDim2.new(1, -24, 0, 30)
+abFrame.Position = UDim2.new(0, 12, 1, -38)
+abFrame.BackgroundTransparency = 1
+abFrame.Parent = w
+
+local function styleBtn(text, posX)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.5, -4, 1, 0) -- แบ่งคนละ 50% หักช่องว่างตรงกลางออกนิดหน่อย
+	btn.Position = UDim2.new(posX, posX == 0 and 0 or 4, 0, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	btn.BorderSizePixel = 0
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(170, 170, 170)
+	btn.TextSize = 11
+	btn.Font = Enum.Font.Code
+	btn.Parent = abFrame
+
+	local bCorner = Instance.new("UICorner", btn)
+	bCorner.CornerRadius = UDim.new(0, 5)
+
+	local bStroke = Instance.new("UIStroke", btn)
+	bStroke.Color = Color3.fromRGB(40, 40, 40)
+	bStroke.Thickness = 1
+
+	return btn, bStroke
+end
+
+local sb, sbStroke = styleBtn("scan", 0)
+local cl, clStroke = styleBtn("clear", 0.5)
+
+-- Button Hover Effects
+sb.MouseEnter:Connect(function() if not sc then sbStroke.Color = Color3.fromRGB(60, 60, 60) sb.TextColor3 = Color3.fromRGB(210, 210, 210) end end)
+sb.MouseLeave:Connect(function() if not sc then sbStroke.Color = Color3.fromRGB(40, 40, 40) sb.TextColor3 = Color3.fromRGB(170, 170, 170) end end)
+cl.MouseEnter:Connect(function() clStroke.Color = Color3.fromRGB(60, 60, 60) cl.TextColor3 = Color3.fromRGB(210, 210, 210) end)
+cl.MouseLeave:Connect(function() clStroke.Color = Color3.fromRGB(40, 40, 40) cl.TextColor3 = Color3.fromRGB(170, 170, 170) end)
+
 --// Full GUI Show / Hide Logic
 mb.MouseButton1Click:Connect(function()
 	w.Visible = false
@@ -250,8 +178,8 @@ openBtn.MouseButton1Click:Connect(function()
 	w.Visible = true
 end)
 
---// Modern Row Element Creator
-local function mr(id, nm)
+--// Modern Row Element Creator (ID Only)
+local function mr(id)
 	local u = "https://create.roblox.com/store/asset/" .. id
 	local e = Instance.new("Frame")
 	e.Size = UDim2.new(1, 0, 0, 30)
@@ -277,12 +205,11 @@ local function mr(id, nm)
 	l.Size = UDim2.new(1, -66, 1, 0)
 	l.Position = UDim2.new(0, 22, 0, 0)
 	l.BackgroundTransparency = 1
-	l.Text = nm .. " [" .. id .. "]"
-	l.TextColor3 = Color3.fromRGB(150, 150, 150)
-	l.TextSize = 10
+	l.Text = id
+	l.TextColor3 = Color3.fromRGB(160, 160, 160)
+	l.TextSize = 10.5
 	l.Font = Enum.Font.Code
 	l.TextXAlignment = Enum.TextXAlignment.Left
-	l.TextTruncate = Enum.TextTruncate.AtEnd
 	l.Parent = e
 
 	local b = Instance.new("TextButton")
@@ -332,25 +259,17 @@ local function ta(obj)
 	local num = sid:match("(%d+)")
 	if not num or f[num] then return end
 
-	local nm = "Unknown"
-	pcall(function() nm = obj.Name end)
-
-	f[num] = {n = nm, o = obj}
-	r[num] = mr(num, nm)
+	f[num] = {o = obj}
+	r[num] = mr(num)
 	cnt = cnt + 1
 	tl.Text = "SOUND SCANNER by Candybibi (" .. cnt .. ")"
-end
-
-local function chk(k)
-	for _, x in next, opt do
-		if x.k == k then return x.v end
-	end
 end
 
 local function dosweep()
 	local i = 0
 
-	if chk("g") and sc then
+	-- Game Descendants
+	if sc then
 		local d = game:GetDescendants()
 		for j = 1, #d do
 			if not sc then return end
@@ -365,7 +284,8 @@ local function dosweep()
 		task.wait()
 	end
 
-	if chk("n") and sc then
+	-- Nil Instances
+	if sc then
 		pcall(function()
 			local ni = getnilinstances()
 			for j = 1, #ni do
@@ -380,7 +300,8 @@ local function dosweep()
 		task.wait()
 	end
 
-	if chk("m") and sc then
+	-- Loaded Modules
+	if sc then
 		pcall(function()
 			local md = getloadedmodules()
 			for j = 1, #md do
@@ -401,39 +322,6 @@ local function dosweep()
 			end
 		end)
 		task.wait()
-	end
-
-	if chk("a") and sc then
-		pcall(function()
-			local al = getinstances()
-			for j = 1, #al do
-				if not sc then return end
-				pcall(function()
-					if al[j]:IsA("Sound") then ta(al[j]) end
-				end)
-				i = i + 1
-				if i % 300 == 0 then task.wait() end
-			end
-			al = nil
-		end)
-		task.wait()
-	end
-
-	if chk("c") and sc then
-		pcall(function()
-			local gc = getgc(true)
-			for j = 1, #gc do
-				if not sc then return end
-				if typeof(gc[j]) == "Instance" then
-					pcall(function()
-						if gc[j]:IsA("Sound") then ta(gc[j]) end
-					end)
-				end
-				i = i + 1
-				if i % 600 == 0 then task.wait() end
-			end
-			gc = nil
-		end)
 	end
 
 	if sc then swept = true end
@@ -492,39 +380,6 @@ cl.MouseButton1Click:Connect(function()
 	cnt = 0
 	swept = false
 	tl.Text = "SOUND SCANNER by Candybibi (0)"
-end)
-
-sv.MouseButton1Click:Connect(function()
-	if cnt == 0 then
-		sv.Text = "empty"
-		svStroke.Color = Color3.fromRGB(120, 60, 60)
-		task.delay(0.8, function() 
-			if sv.Parent then 
-				sv.Text = "save" 
-				svStroke.Color = Color3.fromRGB(40, 40, 40)
-			end 
-		end)
-		return
-	end
-	local ln = {}
-	for num, data in next, f do
-		ln[#ln+1] = data.n .. " | https://create.roblox.com/store/asset/" .. num
-	end
-	table.sort(ln)
-	local ok = pcall(function()
-		local gn = ms:GetProductInfo(game.PlaceId).Name
-		gn = gn:gsub("[^%w%s%-_]",""):gsub("%s+","_")
-		makefolder("SoundScanner")
-		writefile("SoundScanner/" .. gn .. ".txt", table.concat(ln, "\n"))
-	end)
-	sv.Text = ok and "saved" or "error"
-	svStroke.Color = ok and Color3.fromRGB(45, 85, 55) or Color3.fromRGB(120, 60, 60)
-	task.delay(1, function() 
-		if sv.Parent then 
-			sv.Text = "save" 
-			svStroke.Color = Color3.fromRGB(40, 40, 40)
-		end 
-	end)
 end)
 
 sb.MouseButton1Click:Connect(function()
